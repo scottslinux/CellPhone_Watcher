@@ -28,11 +28,12 @@ bool Sensor::readPhonedist()
 
     if (status==VL6180X_ERROR_NONE || status==7)  //if out of range assume there is no phone
     {
-        //Serial.printf("Tray Distance: %d mm  %s\n",phoneDistance,(phoneDistance<TRAY_EMPTY_THRESHOLD)?"PRESENT":"ABSCENT");
+        Serial.printf("Tray Distance: %d mm  %s\n",phoneDistance,(phoneDistance<TRAY_EMPTY_THRESHOLD)?"PRESENT":"ABSCENT");
         return((phoneDistance<TRAY_EMPTY_THRESHOLD)); //⁡⁢⁣⁣𝘁𝗵𝗶𝘀 𝗲𝘃𝗮𝗹𝘂𝗮𝘁𝗲𝘀 𝘁𝗼 𝘁𝗿𝘂𝗲 𝗼𝗿 𝗳𝗮𝗹𝘀𝗲⁡
     }
     else
     {
+
         Serial.printf("Error reading range, status %d\n",status);
         return (false);
     }
@@ -43,9 +44,12 @@ bool Sensor::readDoordist()
 {
     uint16_t doorDistance=doorSensor.read(false);
 
+    if(doorDistance==0) doorDistance=9999;
+
     Serial.printf("Door Distance: %d   %s\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED");
     Serial.println("------------------------------------");
 
+   // digitalWrite(indicatorLED,HIGH);
     return(doorDistance>DOOR_OPEN_THRESHOLD);
 
 

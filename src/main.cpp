@@ -10,6 +10,8 @@
 
 #define xshutPhone D3
 #define xshutDoor D1
+#define indicatorLED D0
+
 I2SClass I2S;
 Adafruit_VL6180X phoneSensor = Adafruit_VL6180X();
 VL53L4CD doorSensor;
@@ -34,6 +36,8 @@ void setup() {
 
   pinMode(xshutPhone,OUTPUT);  //holding xshut pin LOW disables
   pinMode(xshutDoor,OUTPUT);  //
+  pinMode(indicatorLED,OUTPUT);
+  digitalWrite(indicatorLED,LOW);
 
   //  turn both sensors off to reset address changes
   digitalWrite(xshutPhone,LOW);

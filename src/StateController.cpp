@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "StateController.h"
 #include "speech-phone-charging.h"
 #include "Chime.h"
@@ -71,8 +72,9 @@ void StateController::manageStates()
             {
                 if (!phonePlaced)
                 {
+                    digitalWrite(indicatorLED,HIGH);    //turn on blue LED
                     player.write(Chime_raw, sizeof(Chime_raw)); //play the phone is in the tray sound
-
+                    
                     phonePlaced=true;
                 }
             }
@@ -80,6 +82,7 @@ void StateController::manageStates()
             {
                 phonePlaced=false;  //phone is no longer in tray reset for chime sound
                 warningMSGflag=false; //re-arm for next warning
+                digitalWrite(indicatorLED,LOW);
             }
 
 

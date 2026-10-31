@@ -4,6 +4,8 @@
 #include <ESP_I2S.h>
 #include "Sensor.h"
 
+#define indicatorLED  D0
+
 enum class STATES {initializing, monitoring, alarming};
 
 class StateController

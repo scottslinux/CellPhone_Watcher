@@ -3,6 +3,8 @@
 #include<VL53L4CD.h>
 #include <Arduino.h>
 
+#define indicatorLED D0
+
 
 
 
