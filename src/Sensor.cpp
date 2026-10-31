@@ -43,8 +43,8 @@ bool Sensor::readDoordist()
 {
     uint16_t doorDistance=doorSensor.read(false);
 
-   // Serial.printf("Door Distance: %d   %s\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED");
-  //  Serial.println("------------------------------------");
+    Serial.printf("Door Distance: %d   %s\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED");
+    Serial.println("------------------------------------");
 
     return(doorDistance>DOOR_OPEN_THRESHOLD);
 
