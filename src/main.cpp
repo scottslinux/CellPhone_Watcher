@@ -26,6 +26,7 @@ StateController controller(I2S,sensors);
 void setup() {
 
   Serial.begin(115200);
+  Serial.setTxTimeoutMs(0);   // don't block on prints when USB host isn't reading
 
   Wire.begin(D4,D5); //intialize SDA,SCL
   Wire.setClock(400000); // use 400 kHz I2C
