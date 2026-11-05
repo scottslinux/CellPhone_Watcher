@@ -50,7 +50,27 @@ bool Sensor::readDoordist()
     Serial.println("------------------------------------");
 
    // digitalWrite(indicatorLED,HIGH);
-    return(doorDistance>DOOR_OPEN_THRESHOLD);
+    bool doorStatus=(doorDistance>DOOR_OPEN_THRESHOLD); //is the door open (true)
+
+    if(doorStatus)  //if the door was open in one reading take 5 more to confirm
+        {
+            int certaintyIndex=0;
+            for(int i=0;i<5;i++)
+                {   while(!doorSensor.dataReady());
+                    if(doorSensor.read(false)>DOOR_OPEN_THRESHOLD)
+                        certaintyIndex++;
+                    delay(50);  //wait 50ms between readings
+                }
+            return((certaintyIndex>=3)? true:false);
+
+
+
+
+        }
+
+
+
+    return(false);
 
 
 }
