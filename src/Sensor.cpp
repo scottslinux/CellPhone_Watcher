@@ -60,7 +60,7 @@ bool Sensor::readDoordist()
                     while(!doorSensor.dataReady() && millis()-t0<300);  //don't hang if sensor stops responding
                     if(doorSensor.read(false)>DOOR_OPEN_THRESHOLD)
                         certaintyIndex++;
-                    delay(50);  //wait 50ms between readings
+                    delay(10);  //wait 50ms between readings
                 }
             return((certaintyIndex>=3)? true:false);
 

@@ -19,7 +19,7 @@ private:
 
 
     ulong lastScan;
-    ulong scanInterval=200;     //update scan 5xsecond
+    ulong scanInterval=10;     //update scan 
 
     bool startupFlag=false;
 

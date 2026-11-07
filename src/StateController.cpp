@@ -70,7 +70,7 @@ void StateController::manageStates()
             
             if(traystate)
             {
-                if (!phonePlaced)
+                if (!phonePlaced)   //flag so that the sound is only played once
                 {
                     digitalWrite(indicatorLED,HIGH);    //turn on blue LED
                     player.write(Chime_raw, sizeof(Chime_raw)); //play the phone is in the tray sound
@@ -89,9 +89,10 @@ void StateController::manageStates()
             if(traystate && doorstate)
             {
 
-                if(!warningMSGflag)
+                if(!warningMSGflag) //warn only once
                 {
                     warningMSGflag=true;    //so it only plays once
+                    Serial.println("Warning time!");
                     player.write(BritishPhonePrompt_raw,sizeof(BritishPhonePrompt_raw));
 
                 }
