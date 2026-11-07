@@ -43,7 +43,8 @@ bool Sensor::readPhonedist()
 bool Sensor::readDoordist()
 {
     uint16_t doorDistance=doorSensor.read(false);
-
+    
+    
     if(doorDistance==0) doorDistance=9999;
 
     Serial.printf("Door Distance: %d   %s\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED");
@@ -52,26 +53,34 @@ bool Sensor::readDoordist()
    // digitalWrite(indicatorLED,HIGH);
     bool doorStatus=(doorDistance>DOOR_OPEN_THRESHOLD); //is the door open (true)
 
-    if(doorStatus)  //if the door was open in one reading take 5 more to confirm
-        {
+    if(doorStatus)  
+        return(true);
+
+        else
+            return (false);
+    
+    
+    
+    
+    //if the door was open in one reading take 5 more to confirm
+   /*     {
             int certaintyIndex=0;
-            for(int i=0;i<5;i++)
+            for(int i=0;i<3;i++)
                 {   unsigned long t0=millis();
-                    while(!doorSensor.dataReady() && millis()-t0<300);  //don't hang if sensor stops responding
+                    while(!doorSensor.dataReady());  //don't hang if sensor stops responding
                     if(doorSensor.read(false)>DOOR_OPEN_THRESHOLD)
                         certaintyIndex++;
                     delay(10);  //wait 50ms between readings
                 }
-            return((certaintyIndex>=3)? true:false);
+            return((certaintyIndex>=1)? true:false);
 
 
 
 
         }
+*/
 
 
-
-    return(false);
 
 
 }
