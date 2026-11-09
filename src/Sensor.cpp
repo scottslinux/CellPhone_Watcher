@@ -48,44 +48,31 @@ bool Sensor::readDoordist()
 
     //range status=0 for valid....everything else an error state
     uint8_t rangeStatus=doorSensor.ranging_data.range_status;
-    uint8_t Sunshine=doorSensor.ranging_data.ambient_rate_kcps; //check the sunlight effect
+    uint16_t Sunshine=doorSensor.ranging_data.ambient_rate_kcps; //check the sunlight effect
 
     
     
     if(doorDistance==0) doorDistance=9999;
 
-    Serial.printf("Door Distance: %d   %s  || range_status: %i ||Sunlight: %i\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED"),rangeStatus,Sunshine;
+    Serial.printf("Door Distance: %d   %s  || range_status: %i ||Sunlight: %i\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED",rangeStatus,Sunshine);
     Serial.println("------------------------------------");
 
    // digitalWrite(indicatorLED,HIGH);
+    //status 2 = signal too low. In direct sun the reading is useless, so keep the last trusted state
+    if(rangeStatus==2 && Sunshine>SUN_AMBIENT_THRESHOLD)
+    {
+        Serial.printf("Sunlight swamped door sensor -- holding last state: %s\n",lastDoorState?"OPEN":"CLOSED");
+        return(lastDoorState);
+    }
+
     bool doorStatus=(doorDistance>DOOR_OPEN_THRESHOLD); //is the door open (true)
-
-    if(doorStatus)  
-        return(true);
-
-        else
-            return (false);
+    lastDoorState=doorStatus;
+    return(doorStatus);
     
     
     
     
-    //if the door was open in one reading take 5 more to confirm
-   /*     {
-            int certaintyIndex=0;
-            for(int i=0;i<3;i++)
-                {   unsigned long t0=millis();
-                    while(!doorSensor.dataReady());  //don't hang if sensor stops responding
-                    if(doorSensor.read(false)>DOOR_OPEN_THRESHOLD)
-                        certaintyIndex++;
-                    delay(10);  //wait 50ms between readings
-                }
-            return((certaintyIndex>=1)? true:false);
-
-
-
-
-        }
-*/
+   
 
 
 
