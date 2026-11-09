@@ -26,6 +26,7 @@ bool Sensor::readPhonedist()
     uint8_t status=traySensor.readRangeStatus();
 
 
+
     if (status==VL6180X_ERROR_NONE || status==7)  //if out of range assume there is no phone
     {
         Serial.printf("Tray Distance: %d mm  %s\n",phoneDistance,(phoneDistance<TRAY_EMPTY_THRESHOLD)?"PRESENT":"ABSCENT");
@@ -40,14 +41,20 @@ bool Sensor::readPhonedist()
 }
 //-------------------------------------------------
 //   ⁡⁣⁢⁣𝗥𝗲𝗮𝗱 𝘁𝗵𝗲 𝗗𝗼𝗼𝗿 𝗗𝗶𝘀𝘁𝗮𝗻𝗰𝗲 
+
 bool Sensor::readDoordist()
 {
     uint16_t doorDistance=doorSensor.read(false);
+
+    //range status=0 for valid....everything else an error state
+    uint8_t rangeStatus=doorSensor.ranging_data.range_status;
+    uint8_t Sunshine=doorSensor.ranging_data.ambient_rate_kcps; //check the sunlight effect
+
     
     
     if(doorDistance==0) doorDistance=9999;
 
-    Serial.printf("Door Distance: %d   %s\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED");
+    Serial.printf("Door Distance: %d   %s  || range_status: %i ||Sunlight: %i\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED"),rangeStatus,Sunshine;
     Serial.println("------------------------------------");
 
    // digitalWrite(indicatorLED,HIGH);
