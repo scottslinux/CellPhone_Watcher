@@ -44,38 +44,50 @@ bool Sensor::readPhonedist()
 
 bool Sensor::readDoordist()
 {
+    //sensor measures every 200ms but we scan every 10ms...only act on fresh measurements
+    if(!doorSensor.dataReady())
+        return(lastDoorState);
+
     uint16_t doorDistance=doorSensor.read(false);
 
     //range status=0 for valid....everything else an error state
     uint8_t rangeStatus=doorSensor.ranging_data.range_status;
-    uint16_t Sunshine=doorSensor.ranging_data.ambient_rate_kcps; //check the sunlight effect
 
-    
-    
-    if(doorDistance==0) doorDistance=9999;
+    //library stores ambient*8 in a uint16_t which wraps above 65535 in strong sun.
+    //read the raw ambient register and scale it ourselves
+    uint32_t Sunshine=(uint32_t)doorSensor.readReg16Bit(VL53L4CD::RESULT__AMBIENT_RATE)*8;
 
-    Serial.printf("Door Distance: %d   %s  || range_status: %i ||Sunlight: %i\n",doorDistance,(doorDistance>DOOR_OPEN_THRESHOLD)?"OPEN":"CLOSED",rangeStatus,Sunshine);
-    Serial.println("------------------------------------");
+    bool sunny=(Sunshine>SUN_AMBIENT_THRESHOLD);
 
-   // digitalWrite(indicatorLED,HIGH);
-    //status 2 = signal too low. In direct sun the reading is useless, so keep the last trusted state
-    if(rangeStatus==2 && Sunshine>SUN_AMBIENT_THRESHOLD)
+    Serial.printf("Door Distance: %d || range_status: %i || Sunlight: %lu %s\n",
+                  doorDistance,rangeStatus,(unsigned long)Sunshine,sunny?"(SUNNY)":"");
+
+    if(rangeStatus!=0 && sunny)
     {
-        Serial.printf("Sunlight swamped door sensor -- holding last state: %s\n",lastDoorState?"OPEN":"CLOSED");
+        //error reading in sunlight tells us nothing...keep what we had
+        Serial.printf("  untrusted reading -- holding %s\n",lastDoorState?"OPEN":"CLOSED");
+        Serial.println("------------------------------------");
         return(lastDoorState);
     }
 
-    bool doorStatus=(doorDistance>DOOR_OPEN_THRESHOLD); //is the door open (true)
-    lastDoorState=doorStatus;
-    return(doorStatus);
-    
-    
-    
-    
-   
+    //normal light (or a valid reading in sun): distance decides, same as the original logic
+    if(doorDistance==0) doorDistance=9999;
+    bool rawOpen=(doorDistance>DOOR_OPEN_THRESHOLD);
 
+    if(rawOpen)
+    {
+        if(openCount<DOOR_OPEN_CONFIRM) openCount++;
+        if(openCount>=DOOR_OPEN_CONFIRM) lastDoorState=true;   //confirmed open
+    }
+    else
+    {
+        openCount=0;            //any trusted CLOSED reading resets the count
+        lastDoorState=false;
+    }
 
+    Serial.printf("  reading: %s  (%d/%d)  => door %s\n",rawOpen?"OPEN":"CLOSED",openCount,DOOR_OPEN_CONFIRM,
+                  lastDoorState?"OPEN":"CLOSED");
+    Serial.println("------------------------------------");
 
-
+    return(lastDoorState);
 }
-

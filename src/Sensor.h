@@ -20,7 +20,9 @@ private:
     const uint16_t DOOR_OPEN_THRESHOLD=1150; //Measured the door partially open threshold with tape measure. Works in tight parking spots
     const uint16_t TRAY_EMPTY_THRESHOLD=150/2;  //half of the tray distance...something is in there
     const uint16_t SUN_AMBIENT_THRESHOLD=15000; //ambient kcps: direct sun >20k, shade <10k
-    bool lastDoorState=false;   //last trusted door reading (true=open)
+    bool lastDoorState=false;   //last confirmed door state (true=open)
+    const uint8_t DOOR_OPEN_CONFIRM=4;  //fresh OPEN readings in a row before we believe it (~0.8s at 200ms timing)
+    uint8_t openCount=0;        //consecutive OPEN readings so far
 
 public:
     Sensor(Adafruit_VL6180X& ts, VL53L4CD& ds);
